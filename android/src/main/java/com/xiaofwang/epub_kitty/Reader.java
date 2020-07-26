@@ -27,143 +27,132 @@ import io.flutter.plugin.common.MethodChannel;
 
 public class Reader  implements OnHighlightListener, ReadLocatorListener, FolioReader.OnClosedListener{
 
-    private ReaderConfig readerConfig;
-    public FolioReader folioReader;
-    private Context context;
-    public MethodChannel.Result result;
-    private EventChannel.EventSink pageEventSink;
-    private BinaryMessenger messenger;
+  private ReaderConfig readerConfig;
+  public FolioReader folioReader;
+  private Context context;
+  public MethodChannel.Result result;
+  private EventChannel.EventSink pageEventSink;
+  private BinaryMessenger messenger;
 
-    private static final String PAGE_CHANNEL = "com.xiaofwang.epub_reader/page";
+  private static final String PAGE_CHANNEL = "com.xiaofwang.epub_reader/page";
 
-    Reader(Context context, BinaryMessenger messenger,ReaderConfig config){
+  Reader(Context context, BinaryMessenger messenger,ReaderConfig config){
+	
+    readerConfig = config;
+    getHighlightsAndSave();
 
-        readerConfig = config;
-        getHighlightsAndSave();
+    folioReader = FolioReader.get()
+      .setOnHighlightListener(this)
+      .setReadLocatorListener(this)
+      .setOnClosedListener(this);
 
-        folioReader = FolioReader.get()
-                .setOnHighlightListener(this)
-                .setReadLocatorListener(this)
-                .setOnClosedListener(this);
+    this.context = context;
+    setPageHandler(messenger);
+  }
 
-        this.context = context;
-        setPageHandler(messenger);
-    }
+  public void open(String bookPath){
+    ReadLocator readLocator = getLastReadLocator();
+    folioReader.setReadLocator(readLocator);
+    folioReader.setConfig(readerConfig.config, true).openBook(bookPath);
+  }
 
-    public void open(String bookPath){
+  public void openWithLocation(String bookPath, String location){
+    ReadLocator readLocator = ReadLocator.fromJson(location);
+    folioReader.setReadLocator(readLocator);
+    readerConfig.config.setNightMode(true);
+    folioReader.setConfig(readerConfig.config, true).openBook(bookPath);
+  }
 
-        ReadLocator readLocator = getLastReadLocator();
-        folioReader.setReadLocator(readLocator);
-        folioReader.setConfig(readerConfig.config, true)
-                .openBook(bookPath);
+  public void close(){
+    folioReader.close();
+  }
 
-    }
+  private void setPageHandler(BinaryMessenger messenger){
+    new EventChannel(messenger,PAGE_CHANNEL).setStreamHandler(new EventChannel.StreamHandler() {
+      @Override
+      public void onListen(Object o, EventChannel.EventSink eventSink) {
+        pageEventSink = eventSink;
+      }
+      @Override
+      public void onCancel(Object o) {
+      }
+    });
+  }
 
-    public void close(){
-        folioReader.close();
-    }
+  private ReadLocator getLastReadLocator() {
+	String jsonString = loadAssetTextAsString("Locators/LastReadLocators/last_read_locator_1.json");
+    return ReadLocator.fromJson(jsonString);
+  }
 
-    private void setPageHandler(BinaryMessenger messenger){
-
-        new EventChannel(messenger,PAGE_CHANNEL).setStreamHandler(new EventChannel.StreamHandler() {
-            @Override
-            public void onListen(Object o, EventChannel.EventSink eventSink) {
-                pageEventSink = eventSink;
-            }
-
-            @Override
-            public void onCancel(Object o) {
-
-            }
-        });
-    }
-
-    private ReadLocator getLastReadLocator() {
-
-        String jsonString = loadAssetTextAsString("Locators/LastReadLocators/last_read_locator_1.json");
-        return ReadLocator.fromJson(jsonString);
-    }
-
-    private void getHighlightsAndSave() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ArrayList<HighLight> highlightList = null;
-                ObjectMapper objectMapper = new ObjectMapper();
-                try {
-                    highlightList = objectMapper.readValue(
-                            loadAssetTextAsString("highlights/highlights_data.json"),
-                            new TypeReference<List<HighlightData>>() {
-                            });
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                if (highlightList == null) {
-                    folioReader.saveReceivedHighLights(highlightList, new OnSaveHighlight() {
-                        @Override
-                        public void onFinished() {
-                            //You can do anything on successful saving highlight list
-                        }
-                    });
-                }
-            }
-        }).start();
-    }
-
-
-    private String loadAssetTextAsString(String name) {
-        BufferedReader in = null;
+  private void getHighlightsAndSave() {
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        ArrayList<HighLight> highlightList = null;
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            StringBuilder buf = new StringBuilder();
-            InputStream is = context.getAssets().open(name);
-            in = new BufferedReader(new InputStreamReader(is));
-
-            String str;
-            boolean isFirst = true;
-            while ((str = in.readLine()) != null) {
-                if (isFirst)
-                    isFirst = false;
-                else
-                    buf.append('\n');
-                buf.append(str);
-            }
-            return buf.toString();
+          highlightList = objectMapper.readValue(
+              loadAssetTextAsString("highlights/highlights_data.json"),
+              new TypeReference<List<HighlightData>>() {});
         } catch (IOException e) {
-            Log.e("Reader", "Error opening asset " + name);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    Log.e("Reader", "Error closing asset " + name);
-                }
+          e.printStackTrace();
+        }
+        if (highlightList == null) {
+          folioReader.saveReceivedHighLights(highlightList, new OnSaveHighlight() {
+            @Override
+            public void onFinished() {
             }
+          });
         }
-        return null;
-    }
+      }
+    }).start();
+  }
 
-    @Override
-    public void onFolioReaderClosed() {
-
-    }
-
-    @Override
-    public void onHighlight(HighLight highlight, HighLight.HighLightAction type) {
-
-    }
-
-    @Override
-    public void saveReadLocator(ReadLocator readLocator) {
-        Log.e("readLocator","readLocator path:"+readLocator.getLocations().getXpath());
-        Log.e("readLocator","readLocator positoin:"+readLocator.getLocations().getPosition());
-        Log.e("readLocator","readLocator progress:"+readLocator.getLocations().getProgression());
-        Log.e("readLocator","readLocator id:"+readLocator.getLocations().getId());
-
-        if (pageEventSink != null){
-            pageEventSink.success(readLocator.getLocations().getXpath());
+  private String loadAssetTextAsString(String name) {
+    if (name != null) {
+      BufferedReader in = null;
+      try {
+        StringBuilder buf = new StringBuilder();
+        InputStream is = context.getAssets().open(name);
+        in = new BufferedReader(new InputStreamReader(is));
+        String str;
+        boolean isFirst = true;
+        while ((str = in.readLine()) != null) {
+          if (isFirst)
+            isFirst = false;
+          else
+            buf.append('\n');
+          buf.append(str);
         }
+        return buf.toString();
+      } catch (IOException e) {
+        Log.e("Reader", "Error opening asset " + name);
+      } finally {
+        if (in != null) {
+          try {
+            in.close();
+          } catch (IOException e) {
+            Log.e("Reader", "Error closing asset " + name);
+          }
+        }
+      }
     }
+    return null;
+  }
 
+  @Override
+  public void onFolioReaderClosed() {
+  }
+
+  @Override
+  public void onHighlight(HighLight highlight, HighLight.HighLightAction type) {
+  }
+
+  @Override
+  public void saveReadLocator(ReadLocator readLocator) {
+    if (pageEventSink != null){
+      pageEventSink.success(readLocator.toJson());
+    }
+  }
 
 }

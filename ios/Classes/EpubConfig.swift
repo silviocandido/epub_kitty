@@ -38,7 +38,7 @@ class EpubConfig: NSObject {
         self.config.displayTitle = true
         self.config.allowSharing = self.allowSharing
         self.config.tintColor = self.tintColor
-        self.config.canChangeFontStyle = false
+        // self.config.canChangeFontStyle = false
         // Custom sharing quote background
         self.config.quoteCustomBackgrounds = []
         if let image = UIImage(named: "demo-bg") {

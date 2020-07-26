@@ -1,5 +1,7 @@
 package com.xiaofwang.epub_kitty;
 
+import android.util.Log;
+
 import android.app.Activity;
 import android.content.Context;
 
@@ -24,19 +26,17 @@ public class EpubKittyPlugin implements MethodCallHandler {
 
   /** Plugin registration. */
   public static void registerWith(Registrar registrar) {
-
-    context = registrar.context();
+	  context = registrar.context();
     activity = registrar.activity();
     messenger = registrar.messenger();
-
     final MethodChannel channel = new MethodChannel(registrar.messenger(), "epub_kitty");
     channel.setMethodCallHandler(new EpubKittyPlugin());
   }
 
   @Override
   public void onMethodCall(MethodCall call, Result result) {
-
-    if (call.method.equals("setConfig")){
+	
+    if (call.method.equals("setConfig")) {
       Map<String,Object> arguments = (Map<String, Object>) call.arguments;
       String identifier = arguments.get("identifier").toString();
       String themeColor = arguments.get("themeColor").toString();
@@ -44,19 +44,23 @@ public class EpubKittyPlugin implements MethodCallHandler {
       Boolean allowSharing = Boolean.parseBoolean(arguments.get("allowSharing").toString());
       config = new ReaderConfig(context,identifier,themeColor,scrollDirection,allowSharing);
 
-    } else if (call.method.equals("open")){
-
+    } else if (call.method.equals("openWithLocation")) {
       Map<String,Object> arguments = (Map<String, Object>) call.arguments;
       String bookPath = arguments.get("bookPath").toString();
+      String location = arguments.get("location").toString();
+      reader = new Reader(context,messenger,config);
+      reader.openWithLocation(bookPath, location);
 
+    } else if (call.method.equals("open")) {
+      Map<String,Object> arguments = (Map<String, Object>) call.arguments;
+      String bookPath = arguments.get("bookPath").toString();
       reader = new Reader(context,messenger,config);
       reader.open(bookPath);
 
-    }else if(call.method.equals("close")){
+    } else if (call.method.equals("close")) {
       reader.close();
-    }
-
-    else {
+    
+    } else {
       result.notImplemented();
     }
   }
