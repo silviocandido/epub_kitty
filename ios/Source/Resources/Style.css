@@ -236,21 +236,25 @@ html.nightMode .highlight-underline {border-bottom: 2px solid rgba(240, 40, 20, 
  *
  */
 
- @font-face {
+
+@font-face {
     font-family: "Andada";
-    src: url("https://appcaritatem.com.br/fonts/Andada-Regular.otf");
+    src: url("../Fonts/Andada-Regular.otf");
 }
+
 @font-face {
     font-family: "Lato";
-    src: url("https://appcaritatem.com.br/fonts/Lato-Regular.ttf");
+    src: url("../Fonts/Lato-Regular.ttf");
 }
+
 @font-face {
     font-family: "Lora";
-    src: url("https://appcaritatem.com.br/fonts/Lora-Regular.ttf");
+    src: url("../Fonts/Lora-Regular.ttf");
 }
+
 @font-face {
     font-family: "Raleway";
-    src: url("https://appcaritatem.com.br/fonts/Raleway-Regular.ttf");
+    src: url("../Fonts/Raleway-Regular.ttf");
 }
 
 .andada, .andada p, .andada span, .andada div { font-family: "Andada", sans-serif !important; }
