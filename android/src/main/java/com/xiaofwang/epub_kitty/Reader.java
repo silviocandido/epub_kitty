@@ -59,7 +59,6 @@ public class Reader  implements OnHighlightListener, ReadLocatorListener, FolioR
   public void openWithLocation(String bookPath, String location){
     ReadLocator readLocator = ReadLocator.fromJson(location);
     folioReader.setReadLocator(readLocator);
-    readerConfig.config.setNightMode(true);
     folioReader.setConfig(readerConfig.config, true).openBook(bookPath);
   }
 
