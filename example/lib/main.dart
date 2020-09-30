@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'dart:async';
+//import 'dart:async';
 
-import 'package:flutter/services.dart';
+//import 'package:flutter/services.dart';
 import 'package:epub_kitty/epub_kitty.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -15,8 +15,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  static const pageChannel =
-      const EventChannel('com.xiaofwang.epub_kitty/page');
+  // static const pageChannel =  const EventChannel('com.xiaofwang.epub_kitty/page');
 
   @override
   void initState() {
@@ -42,8 +41,7 @@ class _MyAppState extends State<MyApp> {
               print('$appDocDir');
 
               String iosBookPath = '${appDocDir.path}/4.epub';
-              String androidBookPath =
-                  'file:///android_asset/PhysicsSyllabus.epub';
+              //String androidBookPath = 'file:///android_asset/PhysicsSyllabus.epub';
               EpubKitty.setConfig("iosBook", "#32a852", "vertical", true);
               EpubKitty.open(iosBookPath);
             },
