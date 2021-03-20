@@ -57,6 +57,7 @@ public class Reader  implements OnHighlightListener, ReadLocatorListener, FolioR
   }
 
   public void openWithLocation(String bookPath, String location){
+    System.out.println("Reader.openWithLocation");
     ReadLocator readLocator = ReadLocator.fromJson(location);
     folioReader.setReadLocator(readLocator);
     folioReader.setConfig(readerConfig.config, true).openBook(bookPath);
@@ -67,13 +68,16 @@ public class Reader  implements OnHighlightListener, ReadLocatorListener, FolioR
   }
 
   private void setPageHandler(BinaryMessenger messenger){
+    System.out.println("Reader.setPageHandler");
     new EventChannel(messenger,PAGE_CHANNEL).setStreamHandler(new EventChannel.StreamHandler() {
       @Override
       public void onListen(Object o, EventChannel.EventSink eventSink) {
+        System.out.println("Reader.onListen");
         pageEventSink = eventSink;
       }
       @Override
       public void onCancel(Object o) {
+        System.out.println("Reader.onCancel");
       }
     });
   }
