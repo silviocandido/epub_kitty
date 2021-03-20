@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 
 class EpubKitty {
   
   static const MethodChannel _channel = const MethodChannel('epub_kitty');
+  static const EventChannel _pageChannel = const EventChannel('page');
 
   /// @param identifier unique key for epub
   /// @param themeColor 
@@ -35,5 +38,13 @@ class EpubKitty {
       "location": location
     };
     await _channel.invokeMethod('openWithLocation', agrs);
+  }
+
+  /// Stream to get EpubLocator for android and pageNumber for iOS
+  static Stream get locatorStream {
+    Stream pageStream = _pageChannel
+      .receiveBroadcastStream()
+      .map((value) => Platform.isAndroid ? value : '{}');
+    return pageStream;
   }
 }

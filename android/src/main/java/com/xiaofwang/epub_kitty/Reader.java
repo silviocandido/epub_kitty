@@ -34,7 +34,7 @@ public class Reader  implements OnHighlightListener, ReadLocatorListener, FolioR
   private EventChannel.EventSink pageEventSink;
   private BinaryMessenger messenger;
 
-  private static final String PAGE_CHANNEL = "com.xiaofwang.epub_reader/page";
+  private static final String PAGE_CHANNEL = "page";
 
   Reader(Context context, BinaryMessenger messenger,ReaderConfig config){
 	
