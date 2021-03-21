@@ -26,8 +26,7 @@ public class EpubKittyPlugin implements MethodCallHandler {
 
   /** Plugin registration. */
   public static void registerWith(Registrar registrar) {
-    System.out.println("EpubKittyPlugin.registerWith");
-	  context = registrar.context();
+    context = registrar.context();
     activity = registrar.activity();
     messenger = registrar.messenger();
     final MethodChannel channel = new MethodChannel(registrar.messenger(), "epub_kitty");
@@ -36,7 +35,6 @@ public class EpubKittyPlugin implements MethodCallHandler {
 
   @Override
   public void onMethodCall(MethodCall call, Result result) {
-    System.out.println("EpubKittyPlugin.onMethodCall");
     if (call.method.equals("setConfig")) {
       Map<String,Object> arguments = (Map<String, Object>) call.arguments;
       String identifier = arguments.get("identifier").toString();
