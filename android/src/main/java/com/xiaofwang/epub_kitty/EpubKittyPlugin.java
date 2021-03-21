@@ -30,6 +30,16 @@ public class EpubKittyPlugin implements MethodCallHandler {
     activity = registrar.activity();
     messenger = registrar.messenger();
     final MethodChannel channel = new MethodChannel(registrar.messenger(), "epubChannel");
+    // final EventChannel e = new EventChannel(messenger, "pageChannel").setStreamHandler(new EventChannel.StreamHandler() {
+    //   @Override
+    //   public void onListen(Object o, EventChannel.EventSink eventSink) {
+    //     Log.e("Reader", "onListen");
+    //     pageEventSink = eventSink;
+    //   }
+    //   @Override
+    //   public void onCancel(Object o) {
+    //   }
+    // });
     channel.setMethodCallHandler(new EpubKittyPlugin());
   }
 

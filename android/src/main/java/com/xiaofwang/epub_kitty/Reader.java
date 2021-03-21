@@ -66,6 +66,7 @@ public class Reader  implements OnHighlightListener, ReadLocatorListener, FolioR
   }
 
   private void setPageHandler(BinaryMessenger messenger){
+    Log.e("Reader", "setPageHandler");
     new EventChannel(messenger,PAGE_CHANNEL).setStreamHandler(new EventChannel.StreamHandler() {
       @Override
       public void onListen(Object o, EventChannel.EventSink eventSink) {
@@ -152,6 +153,8 @@ public class Reader  implements OnHighlightListener, ReadLocatorListener, FolioR
   public void saveReadLocator(ReadLocator readLocator) {
     Log.e("Reader", "saveReadLocator");
     if (pageEventSink != null){
+      Log.e("Reader", "pageEventSink");
+      Log.e("Reader", readLocator.toJson());
       pageEventSink.success(readLocator.toJson());
     }
   }
