@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 
 class EpubKitty {
   
-  static const MethodChannel _channel = const MethodChannel('epub_kitty');
-  static const EventChannel _pageChannel = const EventChannel('page');
+  static const MethodChannel _channel = const MethodChannel('epubChannel');
+  static const EventChannel _pageChannel = const EventChannel('pageChannel');
 
   /// @param identifier unique key for epub
   /// @param themeColor 

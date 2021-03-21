@@ -29,7 +29,7 @@ public class EpubKittyPlugin implements MethodCallHandler {
     context = registrar.context();
     activity = registrar.activity();
     messenger = registrar.messenger();
-    final MethodChannel channel = new MethodChannel(registrar.messenger(), "epub_kitty");
+    final MethodChannel channel = new MethodChannel(registrar.messenger(), "epubChannel");
     channel.setMethodCallHandler(new EpubKittyPlugin());
   }
 
