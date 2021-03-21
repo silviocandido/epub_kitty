@@ -142,9 +142,6 @@ public class Reader  implements OnHighlightListener, ReadLocatorListener, FolioR
   @Override
   public void onFolioReaderClosed() {
     Log.e("Reader", "onFolioReaderClosed");
-    if (pageEventSink != null){
-      pageEventSink.success(readLocator.toJson());
-    }
   }
 
   @Override
