@@ -42,6 +42,7 @@ class EpubKitty {
 
   /// Stream to get EpubLocator for android and pageNumber for iOS
   static Stream get locatorStream {
+    print(" == locatorStream == ");
     Stream pageStream = _pageChannel
       .receiveBroadcastStream()
       .map((value) => Platform.isAndroid ? value : '{}');
