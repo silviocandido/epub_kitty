@@ -34,11 +34,12 @@ public class Reader  implements OnHighlightListener, ReadLocatorListener, FolioR
   private EventChannel.EventSink pageEventSink;
   private BinaryMessenger messenger;
 
-  private static final String PAGE_CHANNEL = "pageChannel";
+  // private static final String PAGE_CHANNEL = "pageChannel";
 
-  Reader(Context context, BinaryMessenger messenger,ReaderConfig config){
+  Reader(Context context, BinaryMessenger messenger,ReaderConfig config, EventChannel.EventSink e){
 	  this.context = context;
     readerConfig = config;
+    pageEventSink = e;
     getHighlightsAndSave();
 
     folioReader = FolioReader.get()
@@ -46,7 +47,7 @@ public class Reader  implements OnHighlightListener, ReadLocatorListener, FolioR
       .setReadLocatorListener(this)
       .setOnClosedListener(this);
 
-    setPageHandler(messenger);
+    // setPageHandler(messenger);
   }
 
   public void open(String bookPath){
@@ -65,19 +66,19 @@ public class Reader  implements OnHighlightListener, ReadLocatorListener, FolioR
     folioReader.close();
   }
 
-  private void setPageHandler(BinaryMessenger messenger){
-    Log.e("Reader", "setPageHandler");
-    new EventChannel(messenger,PAGE_CHANNEL).setStreamHandler(new EventChannel.StreamHandler() {
-      @Override
-      public void onListen(Object o, EventChannel.EventSink eventSink) {
-        Log.e("Reader", "onListen");
-        pageEventSink = eventSink;
-      }
-      @Override
-      public void onCancel(Object o) {
-      }
-    });
-  }
+  // private void setPageHandler(BinaryMessenger messenger){
+  //   Log.e("Reader", "setPageHandler");
+  //   new EventChannel(messenger,PAGE_CHANNEL).setStreamHandler(new EventChannel.StreamHandler() {
+  //     @Override
+  //     public void onListen(Object o, EventChannel.EventSink eventSink) {
+  //       Log.e("Reader", "onListen");
+  //       pageEventSink = eventSink;
+  //     }
+  //     @Override
+  //     public void onCancel(Object o) {
+  //     }
+  //   });
+  // }
 
   private ReadLocator getLastReadLocator() {
 	String jsonString = loadAssetTextAsString("Locators/LastReadLocators/last_read_locator_1.json");
@@ -151,7 +152,7 @@ public class Reader  implements OnHighlightListener, ReadLocatorListener, FolioR
 
   @Override
   public void saveReadLocator(ReadLocator readLocator) {
-    Log.e("Reader", "saveReadLocator");
+    Log.e("Reader", " == saveReadLocator == ");
     if (pageEventSink != null){
       Log.e("Reader", "pageEventSink");
       Log.e("Reader", readLocator.toJson());
