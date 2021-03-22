@@ -1,11 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/services.dart';
 
 class EpubKitty {
   
-  static const MethodChannel _channel = const MethodChannel('epubChannel');
-  static const EventChannel _pageChannel = const EventChannel('pageChannel');
+  static const MethodChannel _channel = const MethodChannel('epub_kitty');
 
   /// @param identifier unique key for epub
   /// @param themeColor 
@@ -22,30 +19,12 @@ class EpubKitty {
   }
 
   /// @param bookPath the local path in cache
-  static void open(String bookPath) async {
-    Map<String,dynamic> agrs = {
-      "bookPath": bookPath
-    };
-    await _channel.invokeMethod('open', agrs);
-  }
-
-  /// @param bookPath the local path in cache
-  /// @param string as json location
-  /// {"bookId":"0d51478b-52a5-46e1-aa2f-523a9b5720ba","href":"/index_split_006.html","created":1592382265249,"locations":{"cfi":"epubcfi(/0!/4/2[filepos18888]/2/2/2/1:0)"},"title":""}
-  static void openWithLocation(String bookPath, String location) async {
+  static void open(String bookPath, String identifier, String custId) async {
     Map<String,dynamic> agrs = {
       "bookPath": bookPath,
-      "location": location
+      "identifier": identifier,
+      "custId": custId
     };
-    await _channel.invokeMethod('openWithLocation', agrs);
-  }
-
-  /// Stream to get EpubLocator for android and pageNumber for iOS
-  static Stream get locatorStream {
-    print(" == locatorStream == ");
-    Stream pageStream = _pageChannel
-      .receiveBroadcastStream()
-      .map((value) => Platform.isAndroid ? value : '{}');
-    return pageStream;
+    await _channel.invokeMethod('open',agrs);
   }
 }

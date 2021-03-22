@@ -13,7 +13,6 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
-import io.flutter.plugin.common.EventChannel;
 
 /** EpubKittyPlugin */
 public class EpubKittyPlugin implements MethodCallHandler {
@@ -24,31 +23,19 @@ public class EpubKittyPlugin implements MethodCallHandler {
   static private Activity activity;
   static private Context context;
   static BinaryMessenger messenger;
-  static public EventChannel.EventSink pageEventSink;
 
   /** Plugin registration. */
   public static void registerWith(Registrar registrar) {
-    Log.e("Reader", " ---------> registerWith");
-    context = registrar.context();
+	  context = registrar.context();
     activity = registrar.activity();
     messenger = registrar.messenger();
-    final MethodChannel channel = new MethodChannel(registrar.messenger(), "epubChannel");
-    new EventChannel(messenger, "pageChannel").setStreamHandler(new EventChannel.StreamHandler() {
-      @Override
-      public void onListen(Object o, EventChannel.EventSink eventSink) {
-        Log.e("Reader", "onListen");
-        pageEventSink = eventSink;
-      }
-      @Override
-      public void onCancel(Object o) {
-      }
-    });
+    final MethodChannel channel = new MethodChannel(registrar.messenger(), "epub_kitty");
     channel.setMethodCallHandler(new EpubKittyPlugin());
-    Log.e("Reader", " ---------> ok");
   }
 
   @Override
   public void onMethodCall(MethodCall call, Result result) {
+	
     if (call.method.equals("setConfig")) {
       Map<String,Object> arguments = (Map<String, Object>) call.arguments;
       String identifier = arguments.get("identifier").toString();
@@ -57,17 +44,12 @@ public class EpubKittyPlugin implements MethodCallHandler {
       Boolean allowSharing = Boolean.parseBoolean(arguments.get("allowSharing").toString());
       config = new ReaderConfig(context,identifier,themeColor,scrollDirection,allowSharing);
 
-    } else if (call.method.equals("openWithLocation")) {
-      Map<String,Object> arguments = (Map<String, Object>) call.arguments;
-      String bookPath = arguments.get("bookPath").toString();
-      String location = arguments.get("location").toString();
-      reader = new Reader(context,messenger,config,pageEventSink);
-      reader.openWithLocation(bookPath, location);
-
     } else if (call.method.equals("open")) {
       Map<String,Object> arguments = (Map<String, Object>) call.arguments;
       String bookPath = arguments.get("bookPath").toString();
-      reader = new Reader(context,messenger,config,pageEventSink);
+      String identifier = arguments.get("identifier").toString();
+      String custId = arguments.get("custId").toString();
+      reader = new Reader(context,messenger,config, identifier, custId);
       reader.open(bookPath);
 
     } else if (call.method.equals("close")) {
