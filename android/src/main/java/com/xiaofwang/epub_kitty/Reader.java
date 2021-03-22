@@ -31,7 +31,7 @@ public class Reader  implements OnHighlightListener, ReadLocatorListener, FolioR
   public FolioReader folioReader;
   private Context context;
   public MethodChannel.Result result;
-  private EventChannel.EventSink pageEventSink;
+  static public EventChannel.EventSink pageEventSink;
   private BinaryMessenger messenger;
 
   // private static final String PAGE_CHANNEL = "pageChannel";

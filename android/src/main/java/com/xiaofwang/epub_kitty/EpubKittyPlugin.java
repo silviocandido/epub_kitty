@@ -24,7 +24,7 @@ public class EpubKittyPlugin implements MethodCallHandler {
   static private Activity activity;
   static private Context context;
   static BinaryMessenger messenger;
-  static private EventChannel.EventSink pageEventSink;
+  static public EventChannel.EventSink pageEventSink;
 
   /** Plugin registration. */
   public static void registerWith(Registrar registrar) {
