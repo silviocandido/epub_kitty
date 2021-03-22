@@ -24,7 +24,7 @@ public class EpubKittyPlugin implements MethodCallHandler {
   static private Activity activity;
   static private Context context;
   static BinaryMessenger messenger;
-  private EventChannel.EventSink pageEventSink;
+  static private EventChannel.EventSink pageEventSink;
 
   /** Plugin registration. */
   public static void registerWith(Registrar registrar) {
@@ -33,7 +33,7 @@ public class EpubKittyPlugin implements MethodCallHandler {
     activity = registrar.activity();
     messenger = registrar.messenger();
     final MethodChannel channel = new MethodChannel(registrar.messenger(), "epubChannel");
-    final EventChannel e = new EventChannel(messenger, "pageChannel").setStreamHandler(new EventChannel.StreamHandler() {
+    new EventChannel(messenger, "pageChannel").setStreamHandler(new EventChannel.StreamHandler() {
       @Override
       public void onListen(Object o, EventChannel.EventSink eventSink) {
         Log.e("Reader", "onListen");
@@ -67,7 +67,7 @@ public class EpubKittyPlugin implements MethodCallHandler {
     } else if (call.method.equals("open")) {
       Map<String,Object> arguments = (Map<String, Object>) call.arguments;
       String bookPath = arguments.get("bookPath").toString();
-      reader = new Reader(context,messenger,config);
+      reader = new Reader(context,messenger,config,pageEventSink);
       reader.open(bookPath);
 
     } else if (call.method.equals("close")) {
