@@ -43,7 +43,7 @@ public class Reader implements OnHighlightListener, ReadLocatorListener, FolioRe
   private String identifier;
   private String custId;
 
-  private static final String PAGE_CHANNEL = "com.xiaofwang.epub_reader/page";
+  // private static final String PAGE_CHANNEL = "com.xiaofwang.epub_reader/page";
 
   Reader(Context context, BinaryMessenger messenger, ReaderConfig config, String identifier, String custId) {
     this.context = context;
@@ -86,15 +86,15 @@ public class Reader implements OnHighlightListener, ReadLocatorListener, FolioRe
   }
 
   private void setPageHandler(BinaryMessenger messenger){
-    new EventChannel(messenger,PAGE_CHANNEL).setStreamHandler(new EventChannel.StreamHandler() {
-      @Override
-      public void onListen(Object o, EventChannel.EventSink eventSink) {
-        pageEventSink = eventSink;
-      }
-      @Override
-      public void onCancel(Object o) {
-      }
-    });
+    // new EventChannel(messenger,PAGE_CHANNEL).setStreamHandler(new EventChannel.StreamHandler() {
+    //   @Override
+    //   public void onListen(Object o, EventChannel.EventSink eventSink) {
+    //     pageEventSink = eventSink;
+    //   }
+    //   @Override
+    //   public void onCancel(Object o) {
+    //   }
+    // });
   }
 
   private ReadLocator getLastReadLocator() {
@@ -169,19 +169,19 @@ public class Reader implements OnHighlightListener, ReadLocatorListener, FolioRe
   @Override
   public void saveReadLocator(ReadLocator readLocator) {
 
-    Log.e("readLocator","readLocator path:"+readLocator.getLocations().getXpath());
-    Log.e("readLocator","readLocator positoin:"+readLocator.getLocations().getPosition());
-    Log.e("readLocator","readLocator progress:"+readLocator.getLocations().getProgression());
-    Log.e("readLocator","readLocator id:"+readLocator.getLocations().getId());
-
     String bookId = readLocator.getBookId();
     String cfi = readLocator.getLocations().getCfi();
     long created = readLocator.getCreated();
     String href = readLocator.getHref();
 
+    Log.e("readLocator", "bookId:"+readLocator.getBookId());
+    Log.e("readLocator", "cfi:"+readLocator.getLocations().getCfi());
+    Log.e("readLocator", "created:"+readLocator.getCreated());
+    Log.e("readLocator", "href:"+readLocator.getHref());
+
     JSONObject obj = new JSONObject();
     try {
-      obj.put("bookId",bookId);
+      obj.put("bookId", bookId);
       obj.put("cfi", cfi);
       obj.put("created", created);
       obj.put("href", href);

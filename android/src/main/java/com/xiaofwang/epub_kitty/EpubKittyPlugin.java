@@ -42,14 +42,14 @@ public class EpubKittyPlugin implements MethodCallHandler {
       String themeColor = arguments.get("themeColor").toString();
       String scrollDirection = arguments.get("scrollDirection").toString();
       Boolean allowSharing = Boolean.parseBoolean(arguments.get("allowSharing").toString());
-      config = new ReaderConfig(context,identifier,themeColor,scrollDirection,allowSharing);
+      config = new ReaderConfig(context, identifier, themeColor, scrollDirection, allowSharing);
 
     } else if (call.method.equals("open")) {
       Map<String,Object> arguments = (Map<String, Object>) call.arguments;
       String bookPath = arguments.get("bookPath").toString();
       String identifier = arguments.get("identifier").toString();
       String custId = arguments.get("custId").toString();
-      reader = new Reader(context,messenger,config, identifier, custId);
+      reader = new Reader(context, messenger,config, identifier, custId);
       reader.open(bookPath);
 
     } else if (call.method.equals("close")) {
