@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'epub_kitty'
-  s.version          = '0.1.7'
+  s.version          = '0.1.9'
   s.summary          = 'A epub reader flutter plugin project.'
   s.description      = <<-DESC
 A new flutter plugin project.
@@ -44,5 +44,5 @@ A new flutter plugin project.
   s.dependency 'FontBlaster', '4.1.0'
   s.dependency 'RealmSwift', '3.17.3'
   
-  s.ios.deployment_target = '9.0'
+  s.ios.deployment_target = '11.0'
 end
