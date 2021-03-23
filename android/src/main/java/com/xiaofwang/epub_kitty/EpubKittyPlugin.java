@@ -42,6 +42,9 @@ public class EpubKittyPlugin implements MethodCallHandler, ReadLocatorListener {
   private EventChannel.EventSink pageEventSink;
   private static final String PAGE_CHANNEL = "com.xiaofwang.epub_reader/page";
 
+  private String identifier;
+  private String custId;
+
   /** Plugin registration. */
   public static void registerWith(Registrar registrar) {
 	  context = registrar.context();
@@ -65,9 +68,9 @@ public class EpubKittyPlugin implements MethodCallHandler, ReadLocatorListener {
     } else if (call.method.equals("open")) {
       Map<String,Object> arguments = (Map<String, Object>) call.arguments;
       String bookPath = arguments.get("bookPath").toString();
-      String identifier = arguments.get("identifier").toString();
-      String custId = arguments.get("custId").toString();
-      reader = new Reader(context, messenger, config, identifier, custId, pageEventSink);
+      this.identifier = arguments.get("identifier").toString();
+      this.custId = arguments.get("custId").toString();
+      reader = new Reader(context, messenger, config, this.identifier, this.custId);
       reader.open(bookPath);
 
     } else if (call.method.equals("close")) {
