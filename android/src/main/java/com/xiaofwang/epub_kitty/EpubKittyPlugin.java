@@ -2,14 +2,6 @@ package com.xiaofwang.epub_kitty;
 
 import android.util.Log;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.folioreader.Config;
-import com.folioreader.FolioReader;
-import com.folioreader.model.locators.ReadLocator;
-import com.folioreader.util.AppUtil;
-import com.folioreader.util.ReadLocatorListener;
-
 import android.app.Activity;
 import android.content.Context;
 
@@ -21,17 +13,9 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
-import io.flutter.plugin.common.EventChannel;
-
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.readium.r2.shared.Locations;
 
 /** EpubKittyPlugin */
-public class EpubKittyPlugin implements MethodCallHandler, ReadLocatorListener {
+public class EpubKittyPlugin implements MethodCallHandler {
 
   private Reader reader;
   private ReaderConfig config;
@@ -39,11 +23,6 @@ public class EpubKittyPlugin implements MethodCallHandler, ReadLocatorListener {
   static private Activity activity;
   static private Context context;
   static BinaryMessenger messenger;
-  private EventChannel.EventSink pageEventSink;
-  private static final String PAGE_CHANNEL = "com.xiaofwang.epub_reader/page";
-
-  private String identifier;
-  private String custId;
 
   /** Plugin registration. */
   public static void registerWith(Registrar registrar) {
@@ -51,18 +30,7 @@ public class EpubKittyPlugin implements MethodCallHandler, ReadLocatorListener {
     activity = registrar.activity();
     messenger = registrar.messenger();
     final MethodChannel channel = new MethodChannel(registrar.messenger(), "epub_kitty");
-    new EventChannel(messenger,PAGE_CHANNEL).setStreamHandler(new EventChannel.StreamHandler() {
-      @Override
-      public void onListen(Object o, EventChannel.EventSink eventSink) {
-        pageEventSink = eventSink;
-      }
-      @Override
-      public void onCancel(Object o) {
-      }
-    });
     channel.setMethodCallHandler(new EpubKittyPlugin());
-
-    FolioReader.get().setReadLocatorListener(this);
   }
 
   @Override
@@ -79,9 +47,9 @@ public class EpubKittyPlugin implements MethodCallHandler, ReadLocatorListener {
     } else if (call.method.equals("open")) {
       Map<String,Object> arguments = (Map<String, Object>) call.arguments;
       String bookPath = arguments.get("bookPath").toString();
-      this.identifier = arguments.get("identifier").toString();
-      this.custId = arguments.get("custId").toString();
-      reader = new Reader(context, messenger, config, this.identifier, this.custId);
+      String identifier = arguments.get("identifier").toString();
+      String custId = arguments.get("custId").toString();
+      reader = new Reader(context, messenger, config, identifier, custId);
       reader.open(bookPath);
 
     } else if (call.method.equals("close")) {
@@ -89,44 +57,6 @@ public class EpubKittyPlugin implements MethodCallHandler, ReadLocatorListener {
     
     } else {
       result.notImplemented();
-    }
-  }
-
-
-  @Override
-  public void saveReadLocator(ReadLocator readLocator) {
-
-    String bookId = readLocator.getBookId();
-    String cfi = readLocator.getLocations().getCfi();
-    long created = readLocator.getCreated();
-    String href = readLocator.getHref();
-
-    Log.e("readLocator", "bookId: "+readLocator.getBookId());
-    Log.e("readLocator", "cfi: "+readLocator.getLocations().getCfi());
-    Log.e("readLocator", "created: "+readLocator.getCreated());
-    Log.e("readLocator", "href: "+readLocator.getHref());
-    Log.e("readLocator", "json: "+readLocator.toJson());
-
-    JSONObject obj = new JSONObject();
-    try {
-      obj.put("bookId", bookId);
-      obj.put("cfi", cfi);
-      obj.put("created", created);
-      obj.put("href", href);
-
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-
-    SharedPreferences preferences = context.getSharedPreferences(this.custId, Context.MODE_PRIVATE);
-    SharedPreferences.Editor edit = preferences.edit();
-    edit.putString(this.identifier, obj.toString());
-    edit.apply();
-    
-    if (pageEventSink != null){
-      Log.e("readLocator", "pageEventSink != null");
-      Log.e("readLocator", readLocator.toJson());
-      pageEventSink.success(readLocator.toJson());
     }
   }
 }
