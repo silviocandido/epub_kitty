@@ -62,7 +62,7 @@ public class EpubKittyPlugin implements MethodCallHandler, ReadLocatorListener {
     });
     channel.setMethodCallHandler(new EpubKittyPlugin());
 
-    FolioReader.get().setReadLocatorListener(this)
+    FolioReader.get().setReadLocatorListener(this);
   }
 
   @Override
