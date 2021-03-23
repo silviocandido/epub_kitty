@@ -50,6 +50,7 @@ public class EpubKittyPlugin implements MethodCallHandler, ReadLocatorListener {
 	  context = registrar.context();
     activity = registrar.activity();
     messenger = registrar.messenger();
+    final MethodChannel channel = new MethodChannel(registrar.messenger(), "epub_kitty");
     setPageHandler(registrar.messenger());
     channel.setMethodCallHandler(new EpubKittyPlugin());
   }
