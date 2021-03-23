@@ -32,24 +32,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.readium.r2.shared.Locations;
 
-public class Reader implements OnHighlightListener, ReadLocatorListener, FolioReader.OnClosedListener {
+public class Reader implements OnHighlightListener, FolioReader.OnClosedListener {
 
   private ReaderConfig readerConfig;
   public FolioReader folioReader;
   private Context context;
   public MethodChannel.Result result;
-  private EventChannel.EventSink pageEventSink;
+  public EventChannel.EventSink pageEventSink;
   private BinaryMessenger messenger;
   private String identifier;
   private String custId;
 
-  // private static final String PAGE_CHANNEL = "com.xiaofwang.epub_reader/page";
-
-  Reader(Context context, BinaryMessenger messenger, ReaderConfig config, String identifier, String custId, EventChannel.EventSink e) {
+  Reader(Context context, BinaryMessenger messenger, ReaderConfig config, String identifier, String custId) {
     this.context = context;
     this.identifier = identifier;
     this.custId = custId;
-    this.pageEventSink = e;
     readerConfig = config;
     getHighlightsAndSave();
 
@@ -57,8 +54,6 @@ public class Reader implements OnHighlightListener, ReadLocatorListener, FolioRe
       .setOnHighlightListener(this)
       .setReadLocatorListener(this)
       .setOnClosedListener(this);
-
-    // setPageHandler(messenger);
   }
 
   public void open(String bookPath) {
@@ -84,23 +79,6 @@ public class Reader implements OnHighlightListener, ReadLocatorListener, FolioRe
 
   public void close(){
     folioReader.close();
-  }
-
-  // private void setPageHandler(BinaryMessenger messenger){
-    // new EventChannel(messenger,PAGE_CHANNEL).setStreamHandler(new EventChannel.StreamHandler() {
-    //   @Override
-    //   public void onListen(Object o, EventChannel.EventSink eventSink) {
-    //     pageEventSink = eventSink;
-    //   }
-    //   @Override
-    //   public void onCancel(Object o) {
-    //   }
-    // });
-  // }
-
-  private ReadLocator getLastReadLocator() {
-	  String jsonString = loadAssetTextAsString("Locators/LastReadLocators/last_read_locator_1.json");
-    return ReadLocator.fromJson(jsonString);
   }
 
   private void getHighlightsAndSave() {
@@ -165,43 +143,6 @@ public class Reader implements OnHighlightListener, ReadLocatorListener, FolioRe
 
   @Override
   public void onHighlight(HighLight highlight, HighLight.HighLightAction type) {
-  }
-
-  @Override
-  public void saveReadLocator(ReadLocator readLocator) {
-
-    String bookId = readLocator.getBookId();
-    String cfi = readLocator.getLocations().getCfi();
-    long created = readLocator.getCreated();
-    String href = readLocator.getHref();
-
-    Log.e("readLocator", "bookId: "+readLocator.getBookId());
-    Log.e("readLocator", "cfi: "+readLocator.getLocations().getCfi());
-    Log.e("readLocator", "created: "+readLocator.getCreated());
-    Log.e("readLocator", "href: "+readLocator.getHref());
-    Log.e("readLocator", "json: "+readLocator.toJson());
-
-    JSONObject obj = new JSONObject();
-    try {
-      obj.put("bookId", bookId);
-      obj.put("cfi", cfi);
-      obj.put("created", created);
-      obj.put("href", href);
-
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-
-    SharedPreferences preferences = context.getSharedPreferences(this.custId, Context.MODE_PRIVATE);
-    SharedPreferences.Editor edit = preferences.edit();
-    edit.putString(this.identifier, obj.toString());
-    edit.apply();
-    
-    if (pageEventSink != null){
-      Log.e("readLocator", "pageEventSink != null");
-      Log.e("readLocator", readLocator.toJson());
-      pageEventSink.success(readLocator.toJson());
-    }
   }
 
 }

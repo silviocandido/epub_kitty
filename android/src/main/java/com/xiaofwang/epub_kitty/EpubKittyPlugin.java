@@ -2,6 +2,14 @@ package com.xiaofwang.epub_kitty;
 
 import android.util.Log;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.folioreader.Config;
+import com.folioreader.FolioReader;
+import com.folioreader.model.locators.ReadLocator;
+import com.folioreader.util.AppUtil;
+import com.folioreader.util.ReadLocatorListener;
+
 import android.app.Activity;
 import android.content.Context;
 
@@ -15,8 +23,15 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.plugin.common.EventChannel;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.readium.r2.shared.Locations;
+
 /** EpubKittyPlugin */
-public class EpubKittyPlugin implements MethodCallHandler {
+public class EpubKittyPlugin implements MethodCallHandler, ReadLocatorListener {
 
   private Reader reader;
   private ReaderConfig config;
@@ -24,24 +39,15 @@ public class EpubKittyPlugin implements MethodCallHandler {
   static private Activity activity;
   static private Context context;
   static BinaryMessenger messenger;
-  static EventChannel.EventSink pageEventSink;
+  private EventChannel.EventSink pageEventSink;
+  private static final String PAGE_CHANNEL = "com.xiaofwang.epub_reader/page";
 
   /** Plugin registration. */
   public static void registerWith(Registrar registrar) {
 	  context = registrar.context();
     activity = registrar.activity();
     messenger = registrar.messenger();
-    final MethodChannel channel = new MethodChannel(registrar.messenger(), "epub_kitty");
-    new EventChannel(registrar.messenger(), "com.xiaofwang.epub_reader/page").setStreamHandler(new EventChannel.StreamHandler() {
-      @Override
-      public void onListen(Object o, EventChannel.EventSink eventSink) {
-        Log.e("Reader", "onListen");
-        pageEventSink = eventSink;
-      }
-      @Override
-      public void onCancel(Object o) {
-      }
-    });
+    setPageHandler(registrar.messenger());
     channel.setMethodCallHandler(new EpubKittyPlugin());
   }
 
@@ -69,6 +75,55 @@ public class EpubKittyPlugin implements MethodCallHandler {
     
     } else {
       result.notImplemented();
+    }
+  }
+
+  private void setPageHandler(BinaryMessenger messenger){
+    new EventChannel(messenger,PAGE_CHANNEL).setStreamHandler(new EventChannel.StreamHandler() {
+      @Override
+      public void onListen(Object o, EventChannel.EventSink eventSink) {
+        pageEventSink = eventSink;
+      }
+      @Override
+      public void onCancel(Object o) {
+      }
+    });
+  }
+
+    @Override
+  public void saveReadLocator(ReadLocator readLocator) {
+
+    String bookId = readLocator.getBookId();
+    String cfi = readLocator.getLocations().getCfi();
+    long created = readLocator.getCreated();
+    String href = readLocator.getHref();
+
+    Log.e("readLocator", "bookId: "+readLocator.getBookId());
+    Log.e("readLocator", "cfi: "+readLocator.getLocations().getCfi());
+    Log.e("readLocator", "created: "+readLocator.getCreated());
+    Log.e("readLocator", "href: "+readLocator.getHref());
+    Log.e("readLocator", "json: "+readLocator.toJson());
+
+    JSONObject obj = new JSONObject();
+    try {
+      obj.put("bookId", bookId);
+      obj.put("cfi", cfi);
+      obj.put("created", created);
+      obj.put("href", href);
+
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+
+    SharedPreferences preferences = context.getSharedPreferences(this.custId, Context.MODE_PRIVATE);
+    SharedPreferences.Editor edit = preferences.edit();
+    edit.putString(this.identifier, obj.toString());
+    edit.apply();
+    
+    if (pageEventSink != null){
+      Log.e("readLocator", "pageEventSink != null");
+      Log.e("readLocator", readLocator.toJson());
+      pageEventSink.success(readLocator.toJson());
     }
   }
 }
