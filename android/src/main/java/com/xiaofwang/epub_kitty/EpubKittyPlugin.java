@@ -51,7 +51,15 @@ public class EpubKittyPlugin implements MethodCallHandler, ReadLocatorListener {
     activity = registrar.activity();
     messenger = registrar.messenger();
     final MethodChannel channel = new MethodChannel(registrar.messenger(), "epub_kitty");
-    setPageHandler(registrar.messenger());
+    new EventChannel(messenger,PAGE_CHANNEL).setStreamHandler(new EventChannel.StreamHandler() {
+      @Override
+      public void onListen(Object o, EventChannel.EventSink eventSink) {
+        pageEventSink = eventSink;
+      }
+      @Override
+      public void onCancel(Object o) {
+      }
+    });
     channel.setMethodCallHandler(new EpubKittyPlugin());
   }
 
@@ -82,19 +90,8 @@ public class EpubKittyPlugin implements MethodCallHandler, ReadLocatorListener {
     }
   }
 
-  private void setPageHandler(BinaryMessenger messenger){
-    new EventChannel(messenger,PAGE_CHANNEL).setStreamHandler(new EventChannel.StreamHandler() {
-      @Override
-      public void onListen(Object o, EventChannel.EventSink eventSink) {
-        pageEventSink = eventSink;
-      }
-      @Override
-      public void onCancel(Object o) {
-      }
-    });
-  }
 
-    @Override
+  @Override
   public void saveReadLocator(ReadLocator readLocator) {
 
     String bookId = readLocator.getBookId();
