@@ -52,7 +52,6 @@ public class Reader implements OnHighlightListener, FolioReader.OnClosedListener
 
     folioReader = FolioReader.get()
       .setOnHighlightListener(this)
-      .setReadLocatorListener(this)
       .setOnClosedListener(this);
   }
 
