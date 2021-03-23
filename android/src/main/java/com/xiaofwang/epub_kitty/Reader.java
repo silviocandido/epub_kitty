@@ -178,7 +178,7 @@ public class Reader implements OnHighlightListener, ReadLocatorListener, FolioRe
     Log.e("readLocator", "cfi: "+readLocator.getLocations().getCfi());
     Log.e("readLocator", "created: "+readLocator.getCreated());
     Log.e("readLocator", "href: "+readLocator.getHref());
-    Log.e("readLocator", "json: "+readLocator.getJson());
+    Log.e("readLocator", "json: "+readLocator.toJson());
 
     JSONObject obj = new JSONObject();
     try {
@@ -197,7 +197,7 @@ public class Reader implements OnHighlightListener, ReadLocatorListener, FolioRe
     edit.apply();
     
     if (pageEventSink != null){
-      pageEventSink.success(readLocator.getJson());
+      pageEventSink.success(readLocator.toJson());
     }
   }
 
